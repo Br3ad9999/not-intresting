@@ -30,7 +30,7 @@ app.use(
     store: new PgSession({
       pool,
       tableName: "user_sessions",
-      createTableIfMissing: true,
+      createTableIfMissing: false,
     }),
     name: sessionCookieName,
     secret: sessionSecret,

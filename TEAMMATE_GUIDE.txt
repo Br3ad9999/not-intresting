@@ -1,0 +1,1445 @@
+GYM MANAGEMENT SYSTEM - TEAMMATE EXPLANATION GUIDE
+==================================================
+
+Purpose
+-------
+This file explains the full project in simple terms so that any teammate can understand:
+
+1. what the frontend does
+2. what the backend does
+3. how frontend and backend communicate
+4. how PostgreSQL fits into the project
+5. what each table stores
+6. what queries are being used
+7. how login, signup, admin access, insert, display, update, and delete work
+
+
+--------------------------------------------------
+1. PROJECT OVERVIEW
+--------------------------------------------------
+
+This is a Gym Management System built using:
+
+- Frontend: HTML, CSS, JavaScript
+- Backend: Node.js with Express
+- Database: PostgreSQL
+- Authentication style: session-based login using express-session
+
+Main project files:
+
+- index.html
+  Login and signup page
+
+- index.css
+  Styles for index.html
+
+- dashboard.html
+  Main dashboard page after login
+
+- dashboard.css
+  Styles for dashboard.html
+
+- server.js
+  Main backend server with all API routes
+
+- db.js
+  PostgreSQL connection setup and transaction helper
+
+- sql/schema.sql
+  All CREATE TABLE statements
+
+- sql/seed.sql
+  Demo/sample data
+
+- sql/project_queries.sql
+  Important SQL queries for display, update, delete, and GROUP BY + ORDER BY report
+
+- .env
+  Local environment variables such as PostgreSQL username, password, database, and port
+
+
+--------------------------------------------------
+2. HIGH LEVEL FLOW
+--------------------------------------------------
+
+The project works like this:
+
+1. User opens the website.
+2. The server sends index.html.
+3. The browser loads index.css and JavaScript inside index.html.
+4. If the user signs up or logs in, JavaScript sends a fetch request to backend API routes in server.js.
+5. The backend checks PostgreSQL.
+6. If login/signup is successful, the backend stores session data.
+7. The browser moves to dashboard.html.
+8. dashboard.html calls /api/auth/me to learn who is logged in.
+9. If the logged-in user is a normal member, they see member information only.
+10. If the logged-in user is an admin, they also see an admin panel.
+11. The admin panel can:
+   - display protected database data
+   - update member records
+   - delete contact messages
+   - show a GROUP BY + ORDER BY report
+
+
+--------------------------------------------------
+3. FRONTEND EXPLANATION
+--------------------------------------------------
+
+The frontend has 2 main pages:
+
+- index.html
+- dashboard.html
+
+
+3.1 index.html
+----------------
+
+This is the login/signup page.
+
+Important visual sections:
+
+- left marketing panel
+  Shows branding, hero text, stats, and sample gym images
+
+- right form panel
+  Contains:
+  - Login tab
+  - Sign Up tab
+  - username/email input
+  - password input
+  - signup form fields
+  - plan dropdown
+
+Important frontend functions in index.html:
+
+- showLogin()
+  Shows the login form and hides the signup form.
+
+- showSignup()
+  Shows the signup form and hides the login form.
+
+- showToast(msg, type, icon)
+  Displays popup notifications like success or error messages.
+
+- apiFetch(url, options)
+  Wrapper around fetch().
+  It sends requests to backend routes and throws an error if the backend returns failure.
+
+- loadPlans()
+  Calls GET /api/plans
+  Then fills the signup plan dropdown using plan data from PostgreSQL.
+
+- checkExistingSession()
+  Calls GET /api/auth/me
+  If a user is already logged in, it redirects to dashboard.html.
+
+- handleSignup(e)
+  Prevents normal form submission.
+  Reads full name, email, password, and selected plan from the form.
+  Sends POST /api/auth/signup to the backend.
+  If successful, user is redirected to dashboard.html.
+
+- handleLogin(e)
+  Prevents normal form submission.
+  Reads username/email and password.
+  Sends POST /api/auth/login to the backend.
+  If successful, user is redirected to dashboard.html.
+
+- guestLogin()
+  Logs in using demo member credentials:
+  arjun / Member@123
+  by calling POST /api/auth/login
+
+- openPhoto() and closePhoto()
+  Used only for the image preview modal.
+
+What happens on page load:
+
+- DOMContentLoaded event runs
+- loadPlans() is called
+- checkExistingSession() is called
+
+So the page immediately:
+
+- fetches plan data from database
+- checks whether someone is already logged in
+
+
+3.2 index.css
+--------------
+
+This file contains all styling for index.html.
+
+It controls:
+
+- page layout
+- left and right panels
+- logo
+- hero text
+- forms
+- buttons
+- toast popup
+- photo modal
+- responsive behavior for smaller screens
+
+No backend logic exists in CSS. CSS only affects presentation.
+
+
+3.3 dashboard.html
+-------------------
+
+This is the main page after login.
+
+Main sections visible to all logged-in users:
+
+- navbar
+- hero banner
+- statistics cards
+- account/profile card
+- overview section
+- trainers section
+- plans section
+- gallery section
+- contact section
+
+Admin-only section:
+
+- admin control panel
+
+Important frontend functions in dashboard.html:
+
+- showToast(msg, type, icon)
+  Displays messages on the dashboard.
+
+- apiFetch(url, options)
+  Same idea as on index page.
+  Sends requests to backend and handles JSON responses.
+
+- formatDate(dateValue)
+  Converts database date values into readable format.
+
+- formatCurrency(value)
+  Shows money values like INR currency text.
+
+- escapeHtml(value)
+  Prevents unsafe raw HTML insertion when rendering database content.
+
+- updateTodayRow()
+  Highlights the current day in the opening-hours section.
+
+- switchSection(btn, id)
+  Handles section tab switching like overview, trainers, plans, gallery, contact, admin.
+
+- renderProfile(user)
+  Updates the "Your Account" card.
+  It shows:
+  - full name
+  - login/email
+  - plan
+  - role/status
+
+- getStatusChip(status)
+  Returns a small colored status label like active/pending/cancelled.
+
+- renderPlanReport(rows)
+  Takes admin report data from backend and fills the plan report table.
+
+- renderMembers(rows)
+  Creates the admin member management table.
+  Each row contains:
+  - member info
+  - plan dropdown
+  - membership status dropdown
+  - active checkbox
+  - save button
+
+- renderMessages(rows)
+  Creates the admin contact message table.
+  Each row shows sender, message, submitted date, and delete button.
+
+- renderAdminData(data)
+  Updates the entire admin area using backend response from /api/admin/overview.
+
+- loadAdminData()
+  Calls GET /api/admin/overview
+  Then displays:
+  - summary counts
+  - plan report
+  - members table
+  - messages table
+
+- logout()
+  Calls POST /api/auth/logout and redirects to index.html
+
+- sendMessage()
+  Reads contact form data on dashboard
+  Sends POST /api/contact
+  If admin is logged in, it refreshes the admin message table too
+
+- saveMember(memberId)
+  Reads plan/status/active values from the member row
+  Sends PUT /api/admin/members/:memberId
+  Used by admin only
+
+- deleteMessage(messageId)
+  Sends DELETE /api/admin/messages/:messageId
+  Used by admin only
+
+- openPhoto() and closePhoto()
+  Used by dashboard gallery modal
+
+- bootstrapPage()
+  This is the main initialization function for dashboard.html.
+  It:
+  - highlights current opening-hours row
+  - calls GET /api/auth/me
+  - checks who is logged in
+  - fills profile information
+  - if user is admin, shows the admin navigation button and loads admin data
+  - if session is invalid, redirects to index.html
+
+What dashboard page load does:
+
+1. browser opens dashboard.html
+2. bootstrapPage() runs
+3. browser asks backend: who is logged in?
+4. backend checks the session
+5. backend returns user data
+6. page fills member/admin information
+7. if admin, page makes one more request to load protected admin data
+
+
+3.4 dashboard.css
+------------------
+
+This file controls dashboard layout and appearance, including:
+
+- navbar
+- hero banner
+- cards
+- section tabs
+- trainers
+- plans
+- gallery
+- contact form
+- profile card
+- admin tables
+- admin buttons
+- status chips
+- mobile responsiveness
+
+
+--------------------------------------------------
+4. BACKEND EXPLANATION
+--------------------------------------------------
+
+Backend files:
+
+- server.js
+- db.js
+
+
+4.1 db.js
+----------
+
+This file handles PostgreSQL connection setup.
+
+What it does:
+
+- imports Pool from pg
+- loads environment variables from .env using dotenv
+- checks whether SSL should be used
+- builds database config using either:
+  - DATABASE_URL
+  OR
+  - individual PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE values
+
+Important pieces:
+
+- pool
+  Connection pool for PostgreSQL
+
+- query(text, params)
+  Helper for normal SQL queries
+
+- withTransaction(work)
+  Helper for multi-step operations
+  It:
+  - opens a DB client
+  - starts BEGIN
+  - runs the provided work
+  - COMMITs on success
+  - ROLLBACKs on error
+
+Why transactions matter:
+
+Signup inserts into multiple tables:
+
+- users
+- members
+- memberships
+
+If one insert fails, transaction rollback keeps data consistent.
+
+
+4.2 server.js
+--------------
+
+This is the main backend server.
+
+Main packages used:
+
+- express
+  Web server framework
+
+- express-session
+  Stores login session information
+
+- bcrypt
+  Hashes and checks passwords securely
+
+- dotenv
+  Loads .env values
+
+- path
+  Helps send HTML files correctly
+
+
+4.3 Express middleware
+-----------------------
+
+The backend uses:
+
+- express.json()
+  Lets server read JSON request bodies
+
+- express.urlencoded({ extended: true })
+  Lets server read form-style request bodies
+
+- session(...)
+  Creates session support
+
+Session stores:
+
+- userId
+- role
+
+after successful login/signup
+
+
+4.4 Utility functions in server.js
+----------------------------------
+
+- asyncHandler(handler)
+  Wraps async route handlers so errors go to Express error handler.
+
+- requireAuth(req, res, next)
+  Blocks routes if no user session exists.
+
+- requireAdmin(req, res, next)
+  Blocks routes unless session exists and role is admin.
+
+- normalizeName(value)
+  Cleans extra spaces from names.
+
+- buildBaseUsername(fullName, email)
+  Creates a username base from email or name.
+
+- generateUniqueUsername(client, fullName, email)
+  Keeps checking database until it finds a unique username.
+
+- fetchCurrentUserProfile(userId, runner)
+  Reads combined user/member/membership/branch data using joins.
+  This is important because frontend needs a single user object with:
+  - username
+  - email
+  - role
+  - member details
+  - branch details
+  - latest membership details
+
+- serializeUser(profile)
+  Converts raw SQL row into cleaner JSON for frontend.
+
+
+--------------------------------------------------
+5. BACKEND ROUTES / API ENDPOINTS
+--------------------------------------------------
+
+These are the routes frontend talks to.
+
+
+5.1 GET /api/health
+--------------------
+
+Purpose:
+- check whether backend can talk to database
+
+Database query:
+- SELECT NOW() AS server_time
+
+Used for:
+- testing server and DB connection
+
+
+5.2 GET /api/plans
+-------------------
+
+Purpose:
+- send active membership plans to signup page
+
+Database query:
+- reads plan_id, plan_name, monthly_fee, duration_months, description
+  from membership_plans
+  where is_active = TRUE
+  ordered by monthly_fee, plan_name
+
+Frontend usage:
+- index.html loadPlans()
+
+
+5.3 POST /api/auth/signup
+--------------------------
+
+Purpose:
+- create a new member account
+
+Input from frontend:
+- fullName
+- email
+- password
+- planId
+
+Checks:
+- all fields must be present
+- password length must be at least 6
+- email must not already exist
+- plan must exist and be active
+
+Transaction steps:
+
+1. Check duplicate email in users
+2. Check selected plan in membership_plans
+3. Generate unique username
+4. Hash password using bcrypt
+5. Pick first branch as default branch
+6. Insert into users
+7. Insert into members
+8. Insert into memberships
+9. Read the full profile back using fetchCurrentUserProfile
+
+Session effect:
+- server stores:
+  - userId
+  - role
+
+Frontend usage:
+- index.html handleSignup()
+
+
+5.4 POST /api/auth/login
+-------------------------
+
+Purpose:
+- log in an existing user
+
+Input from frontend:
+- identifier
+  can be username or email
+- password
+
+Checks:
+
+1. find matching user by username or email
+2. compare given password with password_hash using bcrypt.compare()
+3. if correct:
+   - create session
+   - fetch full profile
+   - send it back
+
+Frontend usage:
+- index.html handleLogin()
+- index.html guestLogin()
+
+
+5.5 POST /api/auth/logout
+--------------------------
+
+Purpose:
+- destroy session and log out user
+
+What happens:
+- req.session.destroy()
+- clearCookie('connect.sid')
+
+Frontend usage:
+- dashboard.html logout()
+
+
+5.6 GET /api/auth/me
+---------------------
+
+Purpose:
+- check who is currently logged in
+
+Protection:
+- requireAuth
+
+What it does:
+- reads session userId
+- fetches profile from database
+- returns clean user JSON
+
+Frontend usage:
+- index.html checkExistingSession()
+- dashboard.html bootstrapPage()
+
+
+5.7 POST /api/contact
+----------------------
+
+Purpose:
+- save contact messages into database
+
+Protection:
+- requireAuth
+
+Input:
+- senderName
+- contactInfo
+- message
+
+Insert target:
+- contact_messages table
+
+Frontend usage:
+- dashboard.html sendMessage()
+
+This route is the "Insert from front-end" part of the DBMS requirement.
+
+
+5.8 GET /api/admin/overview
+----------------------------
+
+Purpose:
+- load all protected admin data
+
+Protection:
+- requireAdmin
+
+This route returns several datasets in one response:
+
+1. summary
+   - active member count
+   - active trainer count
+   - new message count
+   - total paid revenue
+
+2. members
+   - member list with current membership and branch
+
+3. messages
+   - all contact messages
+
+4. plans
+   - active plan list
+
+5. planReport
+   - grouped report of active members and collected amount by plan
+
+Frontend usage:
+- dashboard.html loadAdminData()
+
+This route is the main "Display Data" part for admin.
+
+
+5.9 PUT /api/admin/members/:memberId
+-------------------------------------
+
+Purpose:
+- update member account status and membership plan/status
+
+Protection:
+- requireAdmin
+
+Input:
+- planId
+- membershipStatus
+- isActive
+
+What happens:
+
+1. validate memberId, planId, membershipStatus
+2. confirm member exists
+3. confirm selected plan exists
+4. update members.is_active
+5. find latest membership row for that member
+6. update existing membership if it exists
+   OR
+   insert a new membership row if missing
+
+Frontend usage:
+- dashboard.html saveMember()
+
+This route is the "Update" part of the DBMS requirement.
+
+
+5.10 DELETE /api/admin/messages/:messageId
+-------------------------------------------
+
+Purpose:
+- delete a contact message by id
+
+Protection:
+- requireAdmin
+
+What happens:
+- DELETE FROM contact_messages WHERE message_id = $1
+
+Frontend usage:
+- dashboard.html deleteMessage()
+
+This route is the "Delete" part of the DBMS requirement.
+
+
+5.11 Static file routes
+------------------------
+
+- GET /
+  sends index.html
+
+- GET /index.html
+  sends index.html
+
+- GET /dashboard.html
+  sends dashboard.html
+
+These routes allow browser navigation directly through the Node server.
+
+
+5.12 Global error handler
+--------------------------
+
+If any route throws an error:
+
+- backend logs the error
+- backend returns JSON like:
+  { "error": "..." }
+
+Frontend catches this and shows toast messages.
+
+
+--------------------------------------------------
+6. HOW FRONTEND AND BACKEND COMMUNICATE
+--------------------------------------------------
+
+Communication method:
+
+- JavaScript fetch() calls
+- JSON request bodies
+- JSON responses
+- HTTP methods:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+
+Examples:
+
+1. Signup communication
+
+Frontend:
+- handleSignup() sends POST /api/auth/signup with:
+  {
+    fullName,
+    email,
+    password,
+    planId
+  }
+
+Backend:
+- validates input
+- inserts into database
+- creates session
+- returns:
+  {
+    message: "...",
+    user: { ... }
+  }
+
+
+2. Login communication
+
+Frontend:
+- handleLogin() sends POST /api/auth/login with:
+  {
+    identifier,
+    password
+  }
+
+Backend:
+- checks users table
+- verifies bcrypt hash
+- stores session
+- returns profile JSON
+
+
+3. Session communication
+
+After login, browser automatically keeps session cookie.
+
+Important idea:
+- frontend does NOT manually store password
+- backend session cookie identifies the logged-in user
+
+Then later requests like /api/auth/me or /api/admin/overview can identify the user from session.
+
+
+4. Admin communication
+
+Frontend:
+- dashboard checks role returned by /api/auth/me
+- if role is admin, it shows admin button and loads admin data
+
+Backend:
+- requireAdmin middleware blocks normal users
+
+
+--------------------------------------------------
+7. DATABASE TABLE EXPLANATION
+--------------------------------------------------
+
+All tables are in sql/schema.sql.
+
+
+7.1 branches
+-------------
+
+Purpose:
+- stores gym branch information
+
+Columns:
+
+- branch_id
+  primary key
+
+- branch_name
+  unique branch name
+
+- city
+  city where branch exists
+
+- address_line
+  full address
+
+- phone
+  branch contact number
+
+- email
+  branch contact email
+
+- open_time
+  daily opening time
+
+- close_time
+  daily closing time
+
+Relationship:
+- one branch can have many members
+- one branch can have many trainers
+
+
+7.2 users
+----------
+
+Purpose:
+- stores login credentials and application role
+
+Columns:
+
+- user_id
+  primary key
+
+- username
+  unique username
+
+- email
+  unique email
+
+- password_hash
+  bcrypt hashed password
+
+- role
+  either admin or member
+
+- created_at
+  timestamp of account creation
+
+Relationship:
+- one user can have one member profile
+
+Important note:
+- passwords are never stored in plain text
+
+
+7.3 membership_plans
+---------------------
+
+Purpose:
+- stores available plans like Basic, Pro, Elite
+
+Columns:
+
+- plan_id
+  primary key
+
+- plan_name
+  unique plan name
+
+- monthly_fee
+  price
+
+- duration_months
+  plan duration in months
+
+- description
+  text description
+
+- is_active
+  whether plan is currently available
+
+Relationship:
+- one plan can be used in many memberships
+
+
+7.4 members
+------------
+
+Purpose:
+- stores real member profile details
+
+Columns:
+
+- member_id
+  primary key
+
+- user_id
+  foreign key to users
+  also unique, so one user has only one member profile
+
+- branch_id
+  foreign key to branches
+
+- full_name
+  member full name
+
+- phone
+  member phone number
+
+- join_date
+  date joined
+
+- is_active
+  whether member account is enabled
+
+Relationship:
+- belongs to one user
+- belongs to one branch
+- can have many membership history rows
+- can have many contact messages
+
+
+7.5 memberships
+----------------
+
+Purpose:
+- stores member subscription history
+
+Columns:
+
+- membership_id
+  primary key
+
+- member_id
+  foreign key to members
+
+- plan_id
+  foreign key to membership_plans
+
+- start_date
+  plan start
+
+- end_date
+  plan end
+
+- status
+  active / expired / cancelled / pending
+
+- auto_renew
+  whether plan renews automatically
+
+Important constraint:
+- unique partial index ensures one member cannot have more than one active membership at the same time
+
+Relationship:
+- belongs to one member
+- belongs to one plan
+- can have many payments
+
+
+7.6 payments
+-------------
+
+Purpose:
+- stores payment records for memberships
+
+Columns:
+
+- payment_id
+  primary key
+
+- membership_id
+  foreign key to memberships
+
+- amount
+  amount paid
+
+- payment_method
+  UPI / Card / Cash etc.
+
+- payment_status
+  paid / pending / failed
+
+- paid_on
+  timestamp
+
+Relationship:
+- each payment belongs to one membership
+
+
+7.7 trainers
+-------------
+
+Purpose:
+- stores trainer details
+
+Columns:
+
+- trainer_id
+  primary key
+
+- branch_id
+  foreign key to branches
+
+- full_name
+  trainer name
+
+- specialty
+  area of expertise
+
+- phone
+  contact number
+
+- years_experience
+  experience count
+
+- bio
+  text intro
+
+- is_active
+  active/inactive
+
+Relationship:
+- belongs to one branch
+
+
+7.8 contact_messages
+---------------------
+
+Purpose:
+- stores messages sent through dashboard contact form
+
+Columns:
+
+- message_id
+  primary key
+
+- member_id
+  foreign key to members
+  nullable because some messages could still exist even if member row changes
+
+- sender_name
+  sender display name
+
+- contact_info
+  phone/email
+
+- message
+  actual message text
+
+- status
+  new / in_progress / closed
+
+- submitted_at
+  timestamp
+
+Relationship:
+- belongs to one member if available
+
+
+--------------------------------------------------
+8. TABLE RELATIONSHIP SUMMARY
+--------------------------------------------------
+
+Relationship map:
+
+- branches -> members
+  one-to-many
+
+- branches -> trainers
+  one-to-many
+
+- users -> members
+  one-to-one
+
+- members -> memberships
+  one-to-many
+
+- membership_plans -> memberships
+  one-to-many
+
+- memberships -> payments
+  one-to-many
+
+- members -> contact_messages
+  one-to-many
+
+
+--------------------------------------------------
+9. IMPORTANT SQL QUERIES USED IN THE PROJECT
+--------------------------------------------------
+
+All submission-related queries are in sql/project_queries.sql.
+
+
+9.1 Display query
+------------------
+
+Purpose:
+- display members with branch and current plan
+
+Query:
+
+SELECT
+  m.member_id,
+  m.full_name,
+  u.username,
+  u.email,
+  b.branch_name,
+  current_membership.plan_name,
+  current_membership.status,
+  m.join_date
+FROM members m
+JOIN users u ON u.user_id = m.user_id
+LEFT JOIN branches b ON b.branch_id = m.branch_id
+LEFT JOIN LATERAL (
+  SELECT mp.plan_name, ms.status
+  FROM memberships ms
+  JOIN membership_plans mp ON mp.plan_id = ms.plan_id
+  WHERE ms.member_id = m.member_id
+  ORDER BY (ms.status = 'active') DESC, ms.end_date DESC NULLS LAST, ms.membership_id DESC
+  LIMIT 1
+) AS current_membership ON true
+ORDER BY m.join_date DESC, m.member_id DESC;
+
+Explanation:
+
+- starts from members
+- joins users for login/email info
+- joins branches for branch info
+- uses LATERAL join to choose the latest or active membership row per member
+- orders newest members first
+
+
+9.2 GROUP BY + ORDER BY query
+------------------------------
+
+Purpose:
+- satisfy the DBMS requirement for grouped display data
+- show report by plan
+
+Query:
+
+SELECT
+  mp.plan_name,
+  COUNT(DISTINCT ms.membership_id) FILTER (WHERE ms.status = 'active') AS active_members,
+  COALESCE(SUM(p.amount) FILTER (WHERE p.payment_status = 'paid'), 0) AS collected_amount
+FROM membership_plans mp
+LEFT JOIN memberships ms ON ms.plan_id = mp.plan_id
+LEFT JOIN payments p ON p.membership_id = ms.membership_id
+GROUP BY mp.plan_id, mp.plan_name, mp.monthly_fee
+ORDER BY active_members DESC, mp.monthly_fee ASC;
+
+Explanation:
+
+- groups rows by membership plan
+- counts active memberships in each plan
+- sums paid payment amount
+- orders plans by:
+  1. highest active member count
+  2. then lower monthly fee
+
+This is shown in admin plan report on dashboard.
+
+
+9.3 Update query
+-----------------
+
+Purpose:
+- update a member's membership
+
+Query:
+
+UPDATE memberships
+SET plan_id = 3, status = 'active', end_date = CURRENT_DATE + INTERVAL '30 days'
+WHERE member_id = 2 AND membership_id = (
+  SELECT membership_id
+  FROM memberships
+  WHERE member_id = 2
+  ORDER BY membership_id DESC
+  LIMIT 1
+);
+
+Explanation:
+
+- finds latest membership row for member 2
+- changes plan and status
+- extends end date
+
+In the live app, backend route PUT /api/admin/members/:memberId performs similar logic dynamically.
+
+
+9.4 Delete query
+-----------------
+
+Purpose:
+- delete one contact message
+
+Query:
+
+DELETE FROM contact_messages
+WHERE message_id = 2;
+
+Explanation:
+
+- deletes a specific message row by id
+
+In the live app, backend route DELETE /api/admin/messages/:messageId performs this.
+
+
+--------------------------------------------------
+10. SEED DATA EXPLANATION
+--------------------------------------------------
+
+sql/seed.sql inserts demo data for testing.
+
+It creates:
+
+- 2 branches
+- 3 membership plans
+- 1 admin user
+- 3 member users
+- 3 member profiles
+- 3 memberships
+- 3 payments
+- 4 trainers
+- 2 contact messages
+
+Important demo logins:
+
+- Admin:
+  username: admin
+  email: admin@ironforge.in
+  password: Admin@123
+
+- Member:
+  username: arjun
+  email: arjun@ironforge.in
+  password: Member@123
+
+
+--------------------------------------------------
+11. HOW AUTHENTICATION WORKS
+--------------------------------------------------
+
+Passwords:
+
+- user enters plain password in frontend
+- backend hashes on signup using bcrypt.hash()
+- database stores only password_hash
+
+Login:
+
+- user enters username/email + password
+- backend finds stored hash
+- bcrypt.compare() checks match
+
+Session:
+
+- if login succeeds, backend stores:
+  - userId
+  - role
+  in session
+
+- browser keeps session cookie
+- future requests automatically carry session cookie
+
+Role handling:
+
+- member role:
+  normal dashboard
+
+- admin role:
+  normal dashboard + admin control panel
+
+
+--------------------------------------------------
+12. HOW DBMS REQUIREMENTS ARE SATISFIED
+--------------------------------------------------
+
+Requirement: at least 5 tables
+- satisfied
+- project has 8 tables
+
+Requirement: proper PK/FK relationships
+- satisfied
+- all main tables are related using foreign keys
+
+Requirement: insert from frontend
+- satisfied
+- signup inserts new user/member/membership
+- contact form inserts contact_messages
+
+Requirement: display data
+- satisfied
+- plan list on signup
+- user profile on dashboard
+- admin members/messages/report data
+
+Requirement: GROUP BY and ORDER BY
+- satisfied
+- plan report query uses both GROUP BY and ORDER BY
+
+Requirement: update operation
+- satisfied
+- admin updates member plan/status using PUT /api/admin/members/:memberId
+
+Requirement: delete operation
+- satisfied
+- admin deletes contact messages using DELETE /api/admin/messages/:messageId
+
+
+--------------------------------------------------
+13. REQUEST/RESPONSE EXAMPLES
+--------------------------------------------------
+
+Signup request:
+
+POST /api/auth/signup
+{
+  "fullName": "Riya Joseph",
+  "email": "riya@example.com",
+  "password": "secret123",
+  "planId": 2
+}
+
+Login request:
+
+POST /api/auth/login
+{
+  "identifier": "admin",
+  "password": "Admin@123"
+}
+
+Contact request:
+
+POST /api/contact
+{
+  "senderName": "Arjun Nair",
+  "contactInfo": "arjun@ironforge.in",
+  "message": "Please confirm my batch timing."
+}
+
+Admin member update request:
+
+PUT /api/admin/members/2
+{
+  "planId": 3,
+  "membershipStatus": "active",
+  "isActive": true
+}
+
+
+--------------------------------------------------
+14. COMMON TEAMMATE QUESTIONS
+--------------------------------------------------
+
+Q: Where is login state stored?
+A: In server session, not in localStorage.
+
+Q: How does frontend know user role?
+A: GET /api/auth/me returns user.role.
+
+Q: Why can normal users not see admin data?
+A: Backend uses requireAdmin middleware and frontend only shows admin UI for admin role.
+
+Q: Where are passwords stored?
+A: Only as bcrypt hashes in users.password_hash.
+
+Q: What page should teammates edit for login UI?
+A: index.html and index.css
+
+Q: What page should teammates edit for dashboard UI?
+A: dashboard.html and dashboard.css
+
+Q: Where should backend routes be added?
+A: server.js
+
+Q: Where should new DB tables be added?
+A: sql/schema.sql
+
+
+--------------------------------------------------
+15. FINAL SUMMARY
+--------------------------------------------------
+
+Frontend responsibility:
+
+- show pages
+- capture user input
+- call backend using fetch
+- render returned JSON
+- show admin or member views based on role
+
+Backend responsibility:
+
+- serve HTML files
+- validate input
+- authenticate users
+- manage sessions
+- protect admin routes
+- run SQL queries
+- return JSON for frontend
+
+Database responsibility:
+
+- permanently store users, members, plans, memberships, payments, trainers, branches, and contact messages
+
+Communication responsibility:
+
+- frontend sends HTTP requests
+- backend reads request, queries PostgreSQL, returns JSON
+- frontend updates the UI based on the JSON response
+
+
+END OF GUIDE
