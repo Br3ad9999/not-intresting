@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IronForge Gym — Login</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="bg">
+      <div class="bg-glow1"></div>
+      <div class="bg-glow2"></div>
+      <div class="bg-grid"></div>
+    </div>
+
+    <div class="page">
+      <!-- ── LEFT PANEL ── -->
+      <div class="left">
+        <a href="#" class="logo">
+          <div class="logo-hex">IF</div>
+          <span class="logo-name">IronForge</span>
+        </a>
+
+        <div class="hero">
+          <div class="eyebrow">Premium Fitness Club</div>
+          <h1 class="headline">
+            FORGE<br />
+            YOUR<br />
+            <span class="accent">BEST</span><br />
+            <span class="thin">SELF.</span>
+          </h1>
+          <p class="hero-desc">
+            World-class equipment, elite trainers, and a community that pushes
+            you beyond limits you thought were fixed.
+          </p>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <div class="stat-n">12<span class="unit">K+</span></div>
+            <div class="stat-l">Members</div>
+          </div>
+          <div class="stat">
+            <div class="stat-n">48</div>
+            <div class="stat-l">Trainers</div>
+          </div>
+          <div class="stat">
+            <div class="stat-n">6<span class="unit">AM</span></div>
+            <div class="stat-l">Opens Daily</div>
+          </div>
+        </div>
+
+        <!-- Photo strip -->
+        <div class="photo-strip">
+          <div
+            class="photo-card"
+            onclick="
+              openPhoto(
+                'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=900',
+                'Main Training Floor',
+              )
+            "
+          >
+            <img
+              src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200"
+              alt="Gym floor"
+            />
+            <div class="overlay">🔍</div>
+          </div>
+          <div
+            class="photo-card"
+            onclick="
+              openPhoto(
+                'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=900',
+                'Weight Room',
+              )
+            "
+          >
+            <img
+              src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=200"
+              alt="Weights"
+            />
+            <div class="overlay">🔍</div>
+          </div>
+          <div
+            class="photo-card"
+            onclick="
+              openPhoto(
+                'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=900',
+                'Cardio Zone',
+              )
+            "
+          >
+            <img
+              src="https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=200"
+              alt="Cardio"
+            />
+            <div class="overlay">🔍</div>
+          </div>
+        </div>
+        <div class="photo-label">tap photos to view</div>
+
+        <div class="deco-circle"></div>
+      </div>
+
+      <!-- ── RIGHT PANEL ── -->
+      <div class="right">
+        <div class="form-card">
+          <div class="form-header">
+            <div class="form-title" id="formTitle">WELCOME BACK</div>
+            <div class="form-sub" id="formSub">
+              Sign in to your member portal
+            </div>
+          </div>
+
+          <div class="tabs">
+            <button class="tab-btn active" id="tabLogin" onclick="showLogin()">
+              Login
+            </button>
+            <button class="tab-btn" id="tabSignup" onclick="showSignup()">
+              Sign Up
+            </button>
+          </div>
+
+          <!-- LOGIN -->
+          <form id="loginForm" class="gym-form" onsubmit="handleLogin(event)">
+            <div class="input-group">
+              <label class="input-label">Username or Email</label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input
+                  type="text"
+                  class="gym-input"
+                  id="loginUser"
+                  placeholder="Enter your username or email"
+                  required
+                  autocomplete="username"
+                />
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Password</label>
+              <div class="input-wrap">
+                <span class="input-icon">🔒</span>
+                <input
+                  type="password"
+                  class="gym-input"
+                  id="loginPass"
+                  placeholder="Enter your password"
+                  required
+                  autocomplete="current-password"
+                />
+              </div>
+            </div>
+            <button type="submit" class="submit-btn">Enter the Forge →</button>
+            <div class="divider">or</div>
+            <div class="social-row">
+              <button type="button" class="social-btn" onclick="guestLogin()">
+                🏋️ Guest Demo
+              </button>
+              <button type="button" class="social-btn">📱 Google</button>
+            </div>
+          </form>
+
+          <!-- SIGNUP -->
+          <form
+            id="signupForm"
+            class="gym-form hidden"
+            onsubmit="handleSignup(event)"
+          >
+            <div class="input-group">
+              <label class="input-label">Full Name</label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input
+                  type="text"
+                  class="gym-input"
+                  id="signupUser"
+                  placeholder="Your full name"
+                  required
+                />
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Email</label>
+              <div class="input-wrap">
+                <span class="input-icon">📧</span>
+                <input
+                  type="email"
+                  class="gym-input"
+                  id="signupEmail"
+                  placeholder="you@email.com"
+                  required
+                />
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Password</label>
+              <div class="input-wrap">
+                <span class="input-icon">🔒</span>
+                <input
+                  type="password"
+                  class="gym-input"
+                  id="signupPass"
+                  placeholder="Create a strong password"
+                  required
+                />
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Membership Plan</label>
+              <div class="input-wrap">
+                <span class="input-icon">💪</span>
+                <select class="gym-input plan-select" id="signupPlan" required>
+                  <option value="1">Basic — ₹999/mo</option>
+                  <option value="2" selected>Pro — ₹1,799/mo</option>
+                  <option value="3">Elite — ₹2,999/mo</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn">Create Account →</button>
+          </form>
+
+          <div class="form-sub demo-creds">
+            Demo admin: <strong>admin</strong> / <strong>Admin@123</strong
+            ><br />
+            Demo member: <strong>arjun</strong> / <strong>Member@123</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+      <span id="toastIcon"></span>
+      <span id="toastMsg"></span>
+    </div>
+
+    <!-- Photo Modal -->
+    <div class="photo-modal" id="photoModal" onclick="closePhoto(event)">
+      <button class="modal-close" onclick="closePhoto()">✕</button>
+      <img class="modal-img" id="modalImg" src="" alt="Gym photo" />
+      <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script>
+      function showLogin() {
+        document.getElementById("loginForm").classList.remove("hidden");
+        document.getElementById("signupForm").classList.add("hidden");
+        document.getElementById("tabLogin").classList.add("active");
+        document.getElementById("tabSignup").classList.remove("active");
+        document.getElementById("formTitle").textContent = "WELCOME BACK";
+        document.getElementById("formSub").textContent =
+          "Sign in to your member portal";
+      }
+
+      function showSignup() {
+        document.getElementById("signupForm").classList.remove("hidden");
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("tabSignup").classList.add("active");
+        document.getElementById("tabLogin").classList.remove("active");
+        document.getElementById("formTitle").textContent = "JOIN THE FORGE";
+        document.getElementById("formSub").textContent =
+          "Create your free member account today";
+      }
+
+      function showToast(msg, type = "info", icon = "ℹ️") {
+        const t = document.getElementById("toast");
+        document.getElementById("toastMsg").textContent = msg;
+        document.getElementById("toastIcon").textContent = icon;
+        t.className = "toast " + type + " show";
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.remove("show"), 3400);
+      }
+
+      async function apiFetch(url, options = {}) {
+        const config = { ...options };
+        config.headers = {
+          ...(options.body ? { "Content-Type": "application/json" } : {}),
+          ...(options.headers || {}),
+        };
+
+        const response = await fetch(url, config);
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.error || "Request failed.");
+        }
+
+        return data;
+      }
+
+      async function loadPlans() {
+        try {
+          const data = await apiFetch("/api/plans");
+          const select = document.getElementById("signupPlan");
+          const currentValue = select.value || "2";
+          select.innerHTML = data.plans
+            .map((plan) => {
+              const selected =
+                String(plan.plan_id) === String(currentValue) ? "selected" : "";
+              return `<option value="${plan.plan_id}" ${selected}>${plan.plan_name} — ₹${Number(plan.monthly_fee).toLocaleString("en-IN")}/mo</option>`;
+            })
+            .join("");
+        } catch (error) {
+          console.error(error);
+          showToast(
+            "Plan list could not be loaded. Make sure the backend is running.",
+            "error",
+            "⚠️",
+          );
+        }
+      }
+
+      async function checkExistingSession() {
+        try {
+          const data = await apiFetch("/api/auth/me");
+          if (data.user) {
+            window.location.href = "dashboard.html";
+          }
+        } catch (error) {
+          // No active session is fine here.
+        }
+      }
+
+      async function handleSignup(e) {
+        e.preventDefault();
+
+        const fullName = document.getElementById("signupUser").value.trim();
+        const email = document.getElementById("signupEmail").value.trim();
+        const password = document.getElementById("signupPass").value;
+        const planId = document.getElementById("signupPlan").value;
+
+        if (password.length < 6) {
+          showToast("Password must be at least 6 characters.", "error", "⚠️");
+          return;
+        }
+
+        try {
+          const data = await apiFetch("/api/auth/signup", {
+            method: "POST",
+            body: JSON.stringify({ fullName, email, password, planId }),
+          });
+
+          showToast(
+            `Welcome, ${data.user.name}! Loading your dashboard…`,
+            "success",
+            "✅",
+          );
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 1000);
+        } catch (error) {
+          showToast(error.message, "error", "❌");
+        }
+      }
+
+      async function handleLogin(e) {
+        e.preventDefault();
+
+        const identifier = document.getElementById("loginUser").value.trim();
+        const password = document.getElementById("loginPass").value;
+
+        try {
+          const data = await apiFetch("/api/auth/login", {
+            method: "POST",
+            body: JSON.stringify({ identifier, password }),
+          });
+
+          showToast(
+            `Welcome, ${data.user.name}! Loading your dashboard…`,
+            "success",
+            "🔥",
+          );
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 1000);
+        } catch (error) {
+          showToast(error.message, "error", "❌");
+          document.getElementById("loginPass").value = "";
+        }
+      }
+
+      async function guestLogin() {
+        try {
+          const data = await apiFetch("/api/auth/login", {
+            method: "POST",
+            body: JSON.stringify({
+              identifier: "arjun",
+              password: "Member@123",
+            }),
+          });
+
+          showToast(
+            `Entering demo mode as ${data.user.name}…`,
+            "success",
+            "🏋️",
+          );
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 900);
+        } catch (error) {
+          showToast(error.message, "error", "⚠️");
+        }
+      }
+
+      function openPhoto(src, caption) {
+        document.getElementById("modalImg").src = src;
+        document.getElementById("modalCaption").textContent = caption;
+        document.getElementById("photoModal").classList.add("open");
+      }
+
+      function closePhoto(e) {
+        if (
+          !e ||
+          e.target === document.getElementById("photoModal") ||
+          e.target.classList.contains("modal-close")
+        ) {
+          document.getElementById("photoModal").classList.remove("open");
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        await Promise.all([loadPlans(), checkExistingSession()]);
+      });
+    </script>
+  </body>
+</html>

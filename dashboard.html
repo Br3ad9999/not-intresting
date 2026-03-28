@@ -1,0 +1,1270 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IronForge — Member Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="index.html" class="logo">
+        <div class="logo-hex">IF</div>
+        <span class="logo-name">IronForge</span>
+      </a>
+      <div class="nav-right">
+        <div class="nav-badge">
+          Hello, <span id="memberName">Member</span> 👋
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+
+    <div class="hero-banner">
+      <img
+        class="hero-img"
+        src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1400"
+        alt="Gym"
+      />
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div>
+          <div class="hero-title">MEMBER <span>DASHBOARD</span></div>
+          <div class="hero-sub">
+            Your fitness command centre — everything you need, all in one place.
+          </div>
+        </div>
+        <div>
+          <div class="status-pill">
+            <div class="status-dot"></div>
+            Gym Open Now
+          </div>
+          <div class="hero-hours">Mon–Sat &middot; 6 AM – 11 PM</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="sc-icon">🏋️</div>
+          <div class="sc-label">Equipment</div>
+          <div class="sc-val">200<span class="sc-suffix">+</span></div>
+          <div class="sc-sub">Machines &amp; weights</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">👥</div>
+          <div class="sc-label">Members</div>
+          <div class="sc-val">12<span class="sc-suffix">K</span></div>
+          <div class="sc-sub">Across all branches</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">🏆</div>
+          <div class="sc-label">Trainers</div>
+          <div class="sc-val">48</div>
+          <div class="sc-sub">Certified professionals</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">📍</div>
+          <div class="sc-label">Branches</div>
+          <div class="sc-val">6</div>
+          <div class="sc-sub">Across the city</div>
+        </div>
+      </div>
+
+      <div class="profile-card">
+        <div class="card-header">
+          <div class="card-title">Your Account</div>
+          <div class="card-badge" id="roleBadge">Member Access</div>
+        </div>
+        <div class="card-body">
+          <div class="profile-grid">
+            <div class="profile-item">
+              <div class="profile-label">Full Name</div>
+              <div class="profile-value" id="profileName">Loading…</div>
+            </div>
+            <div class="profile-item">
+              <div class="profile-label">Login</div>
+              <div class="profile-value" id="profileLogin">Loading…</div>
+            </div>
+            <div class="profile-item">
+              <div class="profile-label">Plan</div>
+              <div class="profile-value accent" id="profilePlan">Loading…</div>
+            </div>
+            <div class="profile-item">
+              <div class="profile-label">Status</div>
+              <div class="profile-value" id="profileStatus">Loading…</div>
+            </div>
+          </div>
+          <div class="profile-note profile-note-spaced" id="profileMeta">
+            Fetching membership and branch details from PostgreSQL…
+          </div>
+        </div>
+      </div>
+
+      <div class="section-nav">
+        <button
+          class="snav-btn active"
+          onclick="switchSection(this, 'overview')"
+        >
+          🏠 Overview
+        </button>
+        <button class="snav-btn" onclick="switchSection(this, 'trainers')">
+          💪 Trainers
+        </button>
+        <button class="snav-btn" onclick="switchSection(this, 'plans')">
+          💎 Plans
+        </button>
+        <button class="snav-btn" onclick="switchSection(this, 'gallery')">
+          📸 Gallery
+        </button>
+        <button class="snav-btn" onclick="switchSection(this, 'contact')">
+          📞 Contact
+        </button>
+        <button
+          class="snav-btn"
+          id="adminNavBtn"
+          onclick="switchSection(this, 'admin')"
+          style="display: none"
+        >
+          🛠️ Admin
+        </button>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div id="sec-overview" class="section active">
+        <div class="info-grid">
+          <div class="overview-stack">
+            <div class="info-card">
+              <div class="card-header">
+                <div class="card-title">Opening Hours</div>
+                <div class="card-badge">Live</div>
+              </div>
+              <div class="card-body">
+                <div class="hours-list">
+                  <div class="hours-row" id="row-mon">
+                    <span class="hours-day">Monday</span
+                    ><span class="hours-time">6:00 AM – 11:00 PM</span>
+                  </div>
+                  <div class="hours-row" id="row-tue">
+                    <span class="hours-day">Tuesday</span
+                    ><span class="hours-time">6:00 AM – 11:00 PM</span>
+                  </div>
+                  <div class="hours-row" id="row-wed">
+                    <span class="hours-day">Wednesday</span
+                    ><span class="hours-time">6:00 AM – 11:00 PM</span>
+                  </div>
+                  <div class="hours-row" id="row-thu">
+                    <span class="hours-day">Thursday</span
+                    ><span class="hours-time">6:00 AM – 11:00 PM</span>
+                  </div>
+                  <div class="hours-row" id="row-fri">
+                    <span class="hours-day">Friday</span
+                    ><span class="hours-time">6:00 AM – 11:00 PM</span>
+                  </div>
+                  <div class="hours-row" id="row-sat">
+                    <span class="hours-day">Saturday</span
+                    ><span class="hours-time">7:00 AM – 9:00 PM</span>
+                  </div>
+                  <div class="hours-row" id="row-sun">
+                    <span class="hours-day">Sunday</span
+                    ><span class="hours-time closed">Closed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="card-header">
+                <div class="card-title">Amenities</div>
+              </div>
+              <div class="card-body">
+                <div class="amenity-grid">
+                  <div class="amenity-item">🏊 Swimming Pool</div>
+                  <div class="amenity-item">🧖 Steam Room</div>
+                  <div class="amenity-item">🚿 Locker Rooms</div>
+                  <div class="amenity-item">🥤 Juice Bar</div>
+                  <div class="amenity-item">🧘 Yoga Studio</div>
+                  <div class="amenity-item">🥊 Boxing Ring</div>
+                  <div class="amenity-item">🚴 Spin Studio</div>
+                  <div class="amenity-item">📱 Free WiFi</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="card-header"><div class="card-title">Find Us</div></div>
+            <div class="card-body">
+              <div class="addr-block">
+                <div class="addr-row">
+                  <div class="addr-icon">📍</div>
+                  <div>
+                    <div class="addr-label">Address</div>
+                    <div class="addr-val">
+                      12, Fitness Avenue, Kakkanad<br />Kochi, Kerala — 682030
+                    </div>
+                  </div>
+                </div>
+                <div class="addr-row">
+                  <div class="addr-icon">📞</div>
+                  <div>
+                    <div class="addr-label">Phone</div>
+                    <div class="addr-val">+91 98470 12345</div>
+                  </div>
+                </div>
+                <div class="addr-row">
+                  <div class="addr-icon">📧</div>
+                  <div>
+                    <div class="addr-label">Email</div>
+                    <div class="addr-val">hello@ironforge.in</div>
+                  </div>
+                </div>
+                <div class="addr-row">
+                  <div class="addr-icon">⏰</div>
+                  <div>
+                    <div class="addr-label">Best Time</div>
+                    <div class="addr-val">7–9 AM or 6–8 PM</div>
+                  </div>
+                </div>
+              </div>
+              <button
+                class="map-btn"
+                onclick="showToast('Opening Google Maps…', 'info', '🗺️')"
+              >
+                🗺️ View on Google Maps →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRAINERS -->
+      <div id="sec-trainers" class="section">
+        <div class="section-label">Meet the Experts</div>
+        <div class="section-heading">OUR TRAINERS</div>
+        <div class="trainers-grid">
+          <div class="trainer-card">
+            <div class="trainer-placeholder">💪</div>
+            <div class="trainer-body">
+              <div class="trainer-name">Koresh A Paulose</div>
+              <div class="trainer-spec">Strength &amp; Powerlifting</div>
+              <div class="trainer-bio">
+                10+ years coaching competitive powerlifters. Nationally
+                certified with expertise in progressive overload and
+                periodisation.
+              </div>
+              <div class="trainer-tags">
+                <span class="tag">Deadlifts</span><span class="tag">Squats</span
+                ><span class="tag">Bench Press</span
+                ><span class="tag">Nutrition</span>
+              </div>
+              <div class="trainer-contact">
+                <button
+                  class="contact-btn primary"
+                  onclick="showToast('Calling Paulose…', 'info', '📞')"
+                >
+                  📞 Call</button
+                ><button
+                  class="contact-btn"
+                  onclick="showToast('WhatsApp opened!', 'success', '💬')"
+                >
+                  💬 Chat
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="trainer-card">
+            <div class="trainer-placeholder">🧘</div>
+            <div class="trainer-body">
+              <div class="trainer-name">Gautham RA</div>
+              <div class="trainer-spec">Yoga &amp; Functional Fitness</div>
+              <div class="trainer-bio">
+                Certified Hatha &amp; Vinyasa instructor with 5 years of
+                experience and Portugal super star Cristiano Ronaldo's personal
+                Trainer. Specialises in flexibility, mobility and wellness
+                programmes.
+              </div>
+              <div class="trainer-tags">
+                <span class="tag">Hatha Yoga</span
+                ><span class="tag">Mobility</span><span class="tag">HIIT</span
+                ><span class="tag">Meditation</span>
+              </div>
+              <div class="trainer-contact">
+                <button
+                  class="contact-btn primary"
+                  onclick="showToast('Calling CR7…', 'info', '📞')"
+                >
+                  📞 Call</button
+                ><button
+                  class="contact-btn"
+                  onclick="showToast('WhatsApp opened!', 'success', '💬')"
+                >
+                  💬 Chat
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="trainer-card">
+            <div class="trainer-placeholder">🥊</div>
+            <div class="trainer-body">
+              <div class="trainer-name">Jabin James Jophy</div>
+              <div class="trainer-spec">Boxing &amp; MMA Conditioning</div>
+              <div class="trainer-bio">
+                Former state-level boxer training members in combat sports
+                conditioning. Focuses on explosive power, cardio,Basket ball and
+                self-defence.
+              </div>
+              <div class="trainer-tags">
+                <span class="tag">Boxing</span
+                ><span class="tag">Kickboxing</span
+                ><span class="tag">Cardio</span><span class="tag">Agility</span>
+              </div>
+              <div class="trainer-contact">
+                <button
+                  class="contact-btn primary"
+                  onclick="showToast('Calling Chakara Mon…', 'info', '📞')"
+                >
+                  📞 Call</button
+                ><button
+                  class="contact-btn"
+                  onclick="showToast('WhatsApp opened!', 'success', '💬')"
+                >
+                  💬 Chat
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="trainer-card">
+            <div class="trainer-placeholder">🏃</div>
+            <div class="trainer-body">
+              <div class="trainer-name">Johan Viju</div>
+              <div class="trainer-spec">Cardio &amp; Weight Loss</div>
+              <div class="trainer-bio">
+                Science-backed approach to fat loss and endurance. Has helped
+                200+ clients and even Lionel Messi to reach their goals
+                sustainably and safely.
+              </div>
+              <div class="trainer-tags">
+                <span class="tag">Running</span><span class="tag">HIIT</span
+                ><span class="tag">Fat Loss</span
+                ><span class="tag">Diet Plan</span>
+              </div>
+              <div class="trainer-contact">
+                <button
+                  class="contact-btn primary"
+                  onclick="showToast('Calling Lionel…', 'info', '📞')"
+                >
+                  📞 Call</button
+                ><button
+                  class="contact-btn"
+                  onclick="showToast('WhatsApp opened!', 'success', '💬')"
+                >
+                  💬 Chat
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="trainer-card">
+            <div class="trainer-placeholder">🏊</div>
+            <div class="trainer-body">
+              <div class="trainer-name">Madhav v Menon</div>
+              <div class="trainer-spec">Swimming &amp; Aqua Fitness</div>
+              <div class="trainer-bio">
+                Competitive swimmer and certified aqua fitness instructor.
+                Teaches all levels from beginner strokes to competitive swim
+                coaching.
+              </div>
+              <div class="trainer-tags">
+                <span class="tag">Freestyle</span
+                ><span class="tag">Backstroke</span
+                ><span class="tag">Aqua Aerobics</span>
+              </div>
+              <div class="trainer-contact">
+                <button
+                  class="contact-btn primary"
+                  onclick="showToast('Calling guy with chick…', 'info', '📞')"
+                >
+                  📞 Call</button
+                ><button
+                  class="contact-btn"
+                  onclick="showToast('WhatsApp opened!', 'success', '💬')"
+                >
+                  💬 Chat
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="trainer-card">
+            <div class="trainer-placeholder">🥗</div>
+            <div class="trainer-body">
+              <div class="trainer-name">Mohit K Renjith</div>
+              <div class="trainer-spec">Sports Nutrition &amp; Fitness</div>
+              <div class="trainer-bio">
+                Registered dietician and personal trainer creating custom meal +
+                training plans for muscle gain, fat loss, Music and peak
+                performance.
+              </div>
+              <div class="trainer-tags">
+                <span class="tag">Nutrition</span
+                ><span class="tag">Meal Plans</span
+                ><span class="tag">Hypertrophy</span>
+              </div>
+              <div class="trainer-contact">
+                <button
+                  class="contact-btn primary"
+                  onclick="showToast('Calling Mohit pooja…', 'info', '📞')"
+                >
+                  📞 Call</button
+                ><button
+                  class="contact-btn"
+                  onclick="showToast('WhatsApp opened!', 'success', '💬')"
+                >
+                  💬 Chat
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLANS -->
+      <div id="sec-plans" class="section">
+        <div class="section-label">Membership</div>
+        <div class="section-heading">CHOOSE YOUR PLAN</div>
+        <div class="plans-grid">
+          <div class="plan-card">
+            <div class="plan-name">Basic</div>
+            <div class="plan-price">
+              <span class="plan-amount">₹999</span
+              ><span class="plan-period">/month</span>
+            </div>
+            <div class="plan-features">
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Gym floor access
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Locker room &amp; showers
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>2 group classes/month
+              </div>
+              <div class="plan-feat">
+                <span class="ckd">✦</span>Personal trainer sessions
+              </div>
+              <div class="plan-feat">
+                <span class="ckd">✦</span>Swimming pool access
+              </div>
+              <div class="plan-feat"><span class="ckd">✦</span>Steam room</div>
+            </div>
+            <button
+              class="plan-btn"
+              onclick="
+                showToast('Redirecting to Basic checkout…', 'info', '💳')
+              "
+            >
+              Get Started
+            </button>
+          </div>
+          <div class="plan-card featured">
+            <div class="plan-popular">Most Popular</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">
+              <span class="plan-amount">₹1,799</span
+              ><span class="plan-period">/month</span>
+            </div>
+            <div class="plan-features">
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Everything in Basic
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Unlimited group classes
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>4 PT sessions/month
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Swimming pool access
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Steam room &amp; sauna
+              </div>
+              <div class="plan-feat">
+                <span class="ckd">✦</span>Priority class booking
+              </div>
+            </div>
+            <button
+              class="plan-btn"
+              onclick="showToast('Redirecting to Pro checkout…', 'info', '💳')"
+            >
+              Get Pro
+            </button>
+          </div>
+          <div class="plan-card">
+            <div class="plan-name">Elite</div>
+            <div class="plan-price">
+              <span class="plan-amount">₹2,999</span
+              ><span class="plan-period">/month</span>
+            </div>
+            <div class="plan-features">
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Everything in Pro
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Unlimited PT sessions
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Custom nutrition plan
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Priority class booking
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Guest passes (2/month)
+              </div>
+              <div class="plan-feat on">
+                <span class="ck">✦</span>Exclusive elite lounge
+              </div>
+            </div>
+            <button
+              class="plan-btn"
+              onclick="
+                showToast('Redirecting to Elite checkout…', 'info', '💳')
+              "
+            >
+              Go Elite
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GALLERY -->
+      <div id="sec-gallery" class="section">
+        <div class="section-label">Our Facility</div>
+        <div class="section-heading">GYM GALLERY</div>
+        <div class="gallery-grid">
+          <div
+            class="gal-item"
+            onclick="
+              openPhoto(
+                'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200',
+                'Main Training Floor',
+              )
+            "
+          >
+            <img
+              src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=700"
+              alt="Main floor"
+            />
+            <div class="gal-ov">🔍</div>
+          </div>
+          <div
+            class="gal-item"
+            onclick="
+              openPhoto(
+                'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=1000',
+                'Free Weights Area',
+              )
+            "
+          >
+            <img
+              src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400"
+              alt="Weights"
+            />
+            <div class="gal-ov">🔍</div>
+          </div>
+          <div
+            class="gal-item"
+            onclick="
+              openPhoto(
+                'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1000',
+                'Cardio Zone',
+              )
+            "
+          >
+            <img
+              src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400"
+              alt="Cardio"
+            />
+            <div class="gal-ov">🔍</div>
+          </div>
+          <div
+            class="gal-item"
+            onclick="
+              openPhoto(
+                'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1000',
+                'Yoga Studio',
+              )
+            "
+          >
+            <img
+              src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400"
+              alt="Yoga"
+            />
+            <div class="gal-ov">🔍</div>
+          </div>
+          <div
+            class="gal-item"
+            onclick="
+              openPhoto(
+                'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=1000',
+                'Personal Training',
+              )
+            "
+          >
+            <img
+              src="https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=400"
+              alt="Training"
+            />
+            <div class="gal-ov">🔍</div>
+          </div>
+          <div
+            class="gal-item"
+            onclick="
+              openPhoto(
+                'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=1000',
+                'Boxing Area',
+              )
+            "
+          >
+            <img
+              src="https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=400"
+              alt="Boxing"
+            />
+            <div class="gal-ov">🔍</div>
+          </div>
+          <div
+            class="gal-item"
+            onclick="
+              openPhoto(
+                'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=1000',
+                'Spin Studio',
+              )
+            "
+          >
+            <img
+              src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400"
+              alt="Spin"
+            />
+            <div class="gal-ov">🔍</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div id="sec-contact" class="section">
+        <div class="section-label">Get in Touch</div>
+        <div class="section-heading">CONTACT US</div>
+        <div class="contact-layout">
+          <div class="contact-stack">
+            <div class="info-card">
+              <div class="card-header">
+                <div class="card-title">Phone &amp; WhatsApp</div>
+              </div>
+              <div class="card-body">
+                <div class="addr-block">
+                  <div class="addr-row">
+                    <div class="addr-icon">📞</div>
+                    <div>
+                      <div class="addr-label">Reception</div>
+                      <div class="addr-val">+91 98470 12345</div>
+                    </div>
+                  </div>
+                  <div class="addr-row">
+                    <div class="addr-icon">📞</div>
+                    <div>
+                      <div class="addr-label">Alternate</div>
+                      <div class="addr-val">+91 94470 67890</div>
+                    </div>
+                  </div>
+                  <div class="addr-row">
+                    <div class="addr-icon">💬</div>
+                    <div>
+                      <div class="addr-label">WhatsApp</div>
+                      <div class="addr-val">+91 98470 12345</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="card-header">
+                <div class="card-title">Online</div>
+              </div>
+              <div class="card-body">
+                <div class="addr-block">
+                  <div class="addr-row">
+                    <div class="addr-icon">📧</div>
+                    <div>
+                      <div class="addr-label">General</div>
+                      <div class="addr-val">hello@ironforge.in</div>
+                    </div>
+                  </div>
+                  <div class="addr-row">
+                    <div class="addr-icon">📧</div>
+                    <div>
+                      <div class="addr-label">Memberships</div>
+                      <div class="addr-val">membership@ironforge.in</div>
+                    </div>
+                  </div>
+                  <div class="addr-row">
+                    <div class="addr-icon">📸</div>
+                    <div>
+                      <div class="addr-label">Instagram</div>
+                      <div class="addr-val">@ironforge.gym</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="card-header">
+              <div class="card-title">Send a Message</div>
+            </div>
+            <div class="card-body">
+              <div class="contact-form-stack">
+                <div class="input-group">
+                  <label class="input-label">Your Name</label>
+                  <div class="input-wrap">
+                    <span class="input-icon">👤</span
+                    ><input
+                      type="text"
+                      class="gym-input"
+                      id="cName"
+                      placeholder="Full name"
+                    />
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label class="input-label">Phone / Email</label>
+                  <div class="input-wrap">
+                    <span class="input-icon">📱</span
+                    ><input
+                      type="text"
+                      class="gym-input"
+                      id="cContact"
+                      placeholder="How should we reach you?"
+                    />
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label class="input-label">Message</label
+                  ><textarea
+                    class="gym-input message-input"
+                    id="cMsg"
+                    rows="4"
+                    placeholder="Your question or request…"
+                  ></textarea>
+                </div>
+                <button class="submit-btn" onclick="sendMessage()">
+                  Send Message →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="sec-admin" class="section">
+        <div class="section-label">Protected Data</div>
+        <div class="section-heading">ADMIN CONTROL PANEL</div>
+        <div class="admin-layout">
+          <div class="admin-top">
+            <div class="info-card">
+              <div class="card-header">
+                <div class="card-title">Operational Summary</div>
+                <div class="card-badge">Admin Only</div>
+              </div>
+              <div class="card-body">
+                <div class="summary-grid">
+                  <div class="summary-box">
+                    <div class="summary-label">Active Members</div>
+                    <div class="summary-value" id="summaryMembers">0</div>
+                  </div>
+                  <div class="summary-box">
+                    <div class="summary-label">Active Trainers</div>
+                    <div class="summary-value" id="summaryTrainers">0</div>
+                  </div>
+                  <div class="summary-box">
+                    <div class="summary-label">New Messages</div>
+                    <div class="summary-value" id="summaryMessages">0</div>
+                  </div>
+                  <div class="summary-box">
+                    <div class="summary-label">Revenue</div>
+                    <div class="summary-value" id="summaryRevenue">₹0</div>
+                  </div>
+                </div>
+                <div class="query-note query-note-spaced">
+                  This panel is shown only when the logged-in user has the
+                  application role <strong>admin</strong>.
+                </div>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="card-header">
+                <div class="card-title">Plan Report</div>
+                <div class="card-badge">GROUP BY + ORDER BY</div>
+              </div>
+              <div class="card-body">
+                <div class="query-note">
+                  Query used: active members grouped by membership plan and
+                  ordered by member count.
+                </div>
+                <div class="table-wrap table-wrap-spaced">
+                  <table class="data-table data-table-fluid">
+                    <thead>
+                      <tr>
+                        <th>Plan</th>
+                        <th>Active Members</th>
+                        <th>Collected Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody id="planReportBody">
+                      <tr>
+                        <td colspan="3" class="empty-state">Loading report…</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="card-header">
+              <div class="card-title">Member Management</div>
+              <div class="card-badge">Update</div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Member</th>
+                      <th>Plan</th>
+                      <th>Status</th>
+                      <th>Account</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="memberTableBody">
+                    <tr>
+                      <td colspan="5" class="empty-state">Loading members…</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="card-header">
+              <div class="card-title">Contact Messages</div>
+              <div class="card-badge">Delete</div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Sender</th>
+                      <th>Message</th>
+                      <th>Submitted</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="messageTableBody">
+                    <tr>
+                      <td colspan="4" class="empty-state">Loading messages…</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">
+      <span id="toastIcon"></span><span id="toastMsg"></span>
+    </div>
+    <div class="photo-modal" id="photoModal" onclick="closePhoto(event)">
+      <button class="modal-close" onclick="closePhoto()">✕</button>
+      <img class="modal-img" id="modalImg" src="" alt="" />
+      <div class="modal-caption" id="modalCap"></div>
+    </div>
+
+    <script>
+      let currentUser = null;
+      let adminPlans = [];
+
+      function showToast(msg, type, icon) {
+        const t = document.getElementById("toast");
+        document.getElementById("toastMsg").textContent = msg;
+        document.getElementById("toastIcon").textContent = icon || "ℹ️";
+        t.className = "toast " + (type || "info") + " show";
+        clearTimeout(t._t);
+        t._t = setTimeout(() => t.classList.remove("show"), 3000);
+      }
+
+      async function apiFetch(url, options = {}) {
+        const config = { ...options };
+        config.headers = {
+          ...(options.body ? { "Content-Type": "application/json" } : {}),
+          ...(options.headers || {}),
+        };
+
+        const response = await fetch(url, config);
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.error || "Request failed.");
+        }
+
+        return data;
+      }
+
+      function formatDate(dateValue) {
+        if (!dateValue) return "Not available";
+        const normalized =
+          typeof dateValue === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)
+            ? `${dateValue}T00:00:00`
+            : dateValue;
+        return new Date(normalized).toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      }
+
+      function formatCurrency(value) {
+        return `₹${Number(value || 0).toLocaleString("en-IN")}`;
+      }
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function updateTodayRow() {
+        const dayIds = [
+          "row-sun",
+          "row-mon",
+          "row-tue",
+          "row-wed",
+          "row-thu",
+          "row-fri",
+          "row-sat",
+        ];
+        const today = new Date().getDay();
+        const row = document.getElementById(dayIds[today]);
+        if (row) {
+          row.classList.add("today-row");
+          const day = row.querySelector(".hours-day");
+          if (day && !day.textContent.includes("(Today)")) {
+            day.textContent += " (Today)";
+          }
+        }
+      }
+
+      function switchSection(btn, id) {
+        document
+          .querySelectorAll(".section")
+          .forEach((section) => section.classList.remove("active"));
+        document
+          .querySelectorAll(".snav-btn")
+          .forEach((button) => button.classList.remove("active"));
+        document.getElementById("sec-" + id).classList.add("active");
+        btn.classList.add("active");
+      }
+
+      function renderProfile(user) {
+        document.getElementById("memberName").textContent =
+          user.name || "Member";
+        document.getElementById("profileName").textContent =
+          user.name || "Member";
+        document.getElementById("profileLogin").textContent =
+          `${user.username} · ${user.email}`;
+        document.getElementById("profilePlan").textContent = user.membership
+          ? user.membership.planName
+          : "No active plan";
+        document.getElementById("profileStatus").textContent =
+          user.role === "admin"
+            ? "Admin access enabled"
+            : user.membership
+              ? `${user.membership.status} until ${formatDate(user.membership.endDate)}`
+              : "Membership pending";
+        document.getElementById("roleBadge").textContent =
+          user.role === "admin" ? "Admin Access" : "Member Access";
+        document.getElementById("profileMeta").textContent =
+          user.role === "admin"
+            ? "You can view protected reports and manage member records because this account has admin privileges."
+            : `Branch: ${user.branchName || "Not assigned"}${user.city ? `, ${user.city}` : ""} · Joined on ${formatDate(user.joinDate)}`;
+      }
+
+      function getStatusChip(status) {
+        const safeStatus = String(status || "pending").toLowerCase();
+        return `<span class="status-chip ${safeStatus}">${escapeHtml(safeStatus)}</span>`;
+      }
+
+      function renderPlanReport(rows) {
+        const body = document.getElementById("planReportBody");
+        if (!rows.length) {
+          body.innerHTML =
+            '<tr><td colspan="3" class="empty-state">No report rows available.</td></tr>';
+          return;
+        }
+
+        body.innerHTML = rows
+          .map(
+            (row) => `
+    <tr>
+      <td>${escapeHtml(row.plan_name)}</td>
+      <td>${Number(row.active_members || 0)}</td>
+      <td>${formatCurrency(row.collected_amount || 0)}</td>
+    </tr>
+  `,
+          )
+          .join("");
+      }
+
+      function renderMembers(rows) {
+        const body = document.getElementById("memberTableBody");
+
+        if (!rows.length) {
+          body.innerHTML =
+            '<tr><td colspan="5" class="empty-state">No members found.</td></tr>';
+          return;
+        }
+
+        body.innerHTML = rows
+          .map(
+            (member) => `
+    <tr>
+      <td>
+        ${escapeHtml(member.full_name)}
+        <span class="table-sub">${escapeHtml(member.email)} · ${escapeHtml(member.branch_name || "No branch")}</span>
+      </td>
+      <td>
+        <select class="inline-select" id="plan-${member.member_id}">
+          ${adminPlans
+            .map(
+              (plan) => `
+            <option value="${plan.plan_id}" ${String(plan.plan_id) === String(member.plan_id) ? "selected" : ""}>
+              ${escapeHtml(plan.plan_name)}
+            </option>
+          `,
+            )
+            .join("")}
+        </select>
+      </td>
+      <td>
+        <select class="inline-select" id="status-${member.member_id}">
+          <option value="active" ${member.membership_status === "active" ? "selected" : ""}>Active</option>
+          <option value="pending" ${member.membership_status === "pending" ? "selected" : ""}>Pending</option>
+          <option value="expired" ${member.membership_status === "expired" ? "selected" : ""}>Expired</option>
+          <option value="cancelled" ${member.membership_status === "cancelled" ? "selected" : ""}>Cancelled</option>
+        </select>
+      </td>
+      <td>
+        ${getStatusChip(member.is_active ? "active" : "cancelled")}
+        <span class="table-sub">Joined ${formatDate(member.join_date)}</span>
+        <label class="toggle-wrap toggle-wrap-spaced">
+          <input type="checkbox" id="active-${member.member_id}" ${member.is_active ? "checked" : ""}>
+          Account enabled
+        </label>
+      </td>
+      <td>
+        <div class="stack-actions">
+          <button class="action-btn primary" onclick="saveMember(${member.member_id})">Save Changes</button>
+          <div class="table-sub">${escapeHtml(member.username || "")} · ${escapeHtml(member.plan_name || "No plan")}</div>
+        </div>
+      </td>
+    </tr>
+  `,
+          )
+          .join("");
+      }
+
+      function renderMessages(rows) {
+        const body = document.getElementById("messageTableBody");
+
+        if (!rows.length) {
+          body.innerHTML =
+            '<tr><td colspan="4" class="empty-state">No messages available.</td></tr>';
+          return;
+        }
+
+        body.innerHTML = rows
+          .map(
+            (message) => `
+    <tr>
+      <td>
+        ${escapeHtml(message.sender_name)}
+        <span class="table-sub">${escapeHtml(message.contact_info || "No contact info")}</span>
+      </td>
+      <td>${escapeHtml(message.message)}</td>
+      <td>
+        ${formatDate(message.submitted_at)}
+        <div class="table-sub">${getStatusChip(message.status)}</div>
+      </td>
+      <td><button class="action-btn danger" onclick="deleteMessage(${message.message_id})">Delete</button></td>
+    </tr>
+  `,
+          )
+          .join("");
+      }
+
+      function renderAdminData(data) {
+        adminPlans = data.plans || [];
+        document.getElementById("summaryMembers").textContent =
+          data.summary.activeMembers;
+        document.getElementById("summaryTrainers").textContent =
+          data.summary.activeTrainers;
+        document.getElementById("summaryMessages").textContent =
+          data.summary.newMessages;
+        document.getElementById("summaryRevenue").textContent = formatCurrency(
+          data.summary.revenueTotal,
+        );
+
+        renderPlanReport(data.planReport || []);
+        renderMembers(data.members || []);
+        renderMessages(data.messages || []);
+      }
+
+      async function loadAdminData() {
+        const data = await apiFetch("/api/admin/overview");
+        renderAdminData(data);
+      }
+
+      async function logout() {
+        try {
+          await apiFetch("/api/auth/logout", { method: "POST" });
+        } catch (error) {
+          console.error(error);
+        }
+
+        showToast("See you next time!", "info", "👋");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 900);
+      }
+
+      async function sendMessage() {
+        const senderName =
+          document.getElementById("cName").value.trim() ||
+          (currentUser ? currentUser.name : "");
+        const contactInfo =
+          document.getElementById("cContact").value.trim() ||
+          (currentUser ? currentUser.email : "");
+        const message = document.getElementById("cMsg").value.trim();
+
+        if (!senderName || !message) {
+          showToast("Please fill in name and message.", "error", "⚠️");
+          return;
+        }
+
+        try {
+          await apiFetch("/api/contact", {
+            method: "POST",
+            body: JSON.stringify({ senderName, contactInfo, message }),
+          });
+
+          showToast("Message saved! We'll be in touch soon.", "success", "✅");
+          document.getElementById("cName").value = "";
+          document.getElementById("cContact").value = "";
+          document.getElementById("cMsg").value = "";
+
+          if (currentUser && currentUser.role === "admin") {
+            await loadAdminData();
+          }
+        } catch (error) {
+          showToast(error.message, "error", "❌");
+        }
+      }
+
+      async function saveMember(memberId) {
+        const planId = document.getElementById(`plan-${memberId}`).value;
+        const membershipStatus = document.getElementById(
+          `status-${memberId}`,
+        ).value;
+        const isActive = document.getElementById(`active-${memberId}`).checked;
+
+        try {
+          await apiFetch(`/api/admin/members/${memberId}`, {
+            method: "PUT",
+            body: JSON.stringify({ planId, membershipStatus, isActive }),
+          });
+
+          showToast("Member record updated.", "success", "✅");
+          await loadAdminData();
+        } catch (error) {
+          showToast(error.message, "error", "❌");
+        }
+      }
+
+      async function deleteMessage(messageId) {
+        const confirmed = window.confirm(
+          "Delete this message from the database?",
+        );
+        if (!confirmed) return;
+
+        try {
+          await apiFetch(`/api/admin/messages/${messageId}`, {
+            method: "DELETE",
+          });
+          showToast("Message deleted.", "success", "🗑️");
+          await loadAdminData();
+        } catch (error) {
+          showToast(error.message, "error", "❌");
+        }
+      }
+
+      function openPhoto(src, cap) {
+        document.getElementById("modalImg").src = src;
+        document.getElementById("modalCap").textContent = cap;
+        document.getElementById("photoModal").classList.add("open");
+      }
+
+      function closePhoto(e) {
+        if (
+          !e ||
+          e.target.id === "photoModal" ||
+          e.target.classList.contains("modal-close")
+        ) {
+          document.getElementById("photoModal").classList.remove("open");
+        }
+      }
+
+      async function bootstrapPage() {
+        updateTodayRow();
+
+        try {
+          const data = await apiFetch("/api/auth/me");
+          currentUser = data.user;
+          renderProfile(currentUser);
+          document.getElementById("cName").value = currentUser.name || "";
+          document.getElementById("cContact").value = currentUser.email || "";
+
+          if (currentUser.role === "admin") {
+            document.getElementById("adminNavBtn").style.display =
+              "inline-flex";
+            await loadAdminData();
+          }
+        } catch (error) {
+          window.location.href = "index.html";
+        }
+      }
+
+      window.addEventListener("load", bootstrapPage);
+    </script>
+  </body>
+</html>
