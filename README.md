@@ -1,6 +1,6 @@
 # Gym Management System Backend Setup
 
-This project now uses a Node/Express backend with PostgreSQL for:
+This project uses a Node/Express backend with PostgreSQL for:
 
 - member signup and login
 - session-based authentication
@@ -40,9 +40,3 @@ Open `http://localhost:3000`.
 
 - Admin: `admin` or `admin@ironforge.in` / `Admin@123`
 - Member: `arjun` or `arjun@ironforge.in` / `Member@123`
-
-## SQL files
-
-- `sql/schema.sql`: `CREATE TABLE` queries
-- `sql/seed.sql`: sample data
-- `sql/project_queries.sql`: display/update/delete/report queries for screenshots
